@@ -23,6 +23,8 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 		}
 	}
 
+	public static bool IsCarbonInstalled = Type.GetType("Carbon.Community,Carbon.Common") != null;
+
 	private static ProfilerRunner _runner;
 
 	public static ProfilerRunner Runner => _runner ??= (_runner = new GameObject("Profiler Runner").AddComponent<ProfilerRunner>());
@@ -35,6 +37,12 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 
 	public void OnLoaded(OnHarmonyModLoadedArgs args)
 	{
+		if (IsCarbonInstalled)
+		{
+			Debug.LogError($"Carbon is installed! Remove the Carbon.Profiler HarmonyMod since the profiler is already built in.");
+			return;
+		}
+
 		MonoProfilerConfig.Load(configPath);
 		InitNative();
 

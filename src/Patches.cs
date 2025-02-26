@@ -9,6 +9,10 @@ public class Patches
 	{
 		public static void Postfix()
 		{
+			if (HarmonyProfiler.IsCarbonInstalled)
+			{
+				return;
+			}
 			HarmonyProfiler.InstallCommands();
 		}
 	}
