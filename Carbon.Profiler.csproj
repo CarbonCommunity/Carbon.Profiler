@@ -19,6 +19,11 @@
 	</ItemGroup>
 
 	<Target Name="CustomRelease" AfterTargets="Build" DependsOnTargets="PrepareRelease">
+		<PropertyGroup>
+			<CarbonProfilerDir>$(SolutionDir)..\Release\.tmp\Carbon.Profiler</CarbonProfilerDir>
+		</PropertyGroup>
+		<MakeDir Directories="$(CarbonProfilerDir)\native"/>
 		<Copy SourceFiles="$(OutputPath)$(Product).dll" DestinationFolder="$(c_managed)" />
+		<Copy SourceFiles="$(OutputPath)$(Product).dll" DestinationFolder="$(CarbonProfilerDir)" />
 	</Target>
 </Project>
