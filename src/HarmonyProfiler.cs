@@ -25,6 +25,8 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 
 	public static bool IsCarbonInstalled = Type.GetType("Carbon.Community,Carbon.Common") != null;
 
+	public static bool IsOxideInstalled = Type.GetType("Oxide.Core.Interface,Oxide.Core") != null;
+
 	private static ProfilerRunner _runner;
 
 	public static ProfilerRunner Runner => _runner ??= (_runner = new GameObject("Profiler Runner").AddComponent<ProfilerRunner>());
