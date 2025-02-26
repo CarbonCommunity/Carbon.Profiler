@@ -1,14 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Carbon.Profiler;
 
 namespace Carbon;
 
-public sealed class Profiler : IHarmonyModHooks
+public sealed class HarmonyProfiler : IHarmonyModHooks
 {
+	public static readonly string configPath = Path.Combine(HarmonyLoader.modPath, "config.profiler.json");
+
 	public void OnLoaded(OnHarmonyModLoadedArgs args)
 	{
-		Config.Init();
+		MonoProfilerConfig.Load(configPath);
 		InitNative();
 	}
 
@@ -27,16 +30,14 @@ public sealed class Profiler : IHarmonyModHooks
 	public static unsafe void InitNative()
 	{
 #if UNIX
-        mono_dllmap_insert(ModuleHandle.EmptyHandle, "CarbonNative", null, Path.Combine(HarmonyLoader.modPath, "libCarbonNative.so"), null);
+        mono_dllmap_insert(ModuleHandle.EmptyHandle, "CarbonNative", null, Path.Combine(HarmonyLoader.modPath, "native", "libCarbonNative.so"), null);
 #elif WIN
-		mono_dllmap_insert(ModuleHandle.EmptyHandle, "CarbonNative", null, Path.Combine(HarmonyLoader.modPath, "CarbonNative.dll"), null);
+		mono_dllmap_insert(ModuleHandle.EmptyHandle, "CarbonNative", null, Path.Combine(HarmonyLoader.modPath, "native", "CarbonNative.dll"), null);
 #endif
 
-		var path = Config.FilePath;
-
-		fixed (char* ptr = path)
+		fixed (char* ptr = configPath)
 		{
-			init_profiler(ptr, path.Length);
+			init_profiler(ptr, configPath.Length);
 		}
 	}
 
