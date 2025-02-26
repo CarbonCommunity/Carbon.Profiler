@@ -2,11 +2,16 @@
 	<PropertyGroup>
 		<Product>Carbon.Profiler</Product>
 		<OutputType>Library</OutputType>
+		<TargetFramework>net48</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
-	<Import Project="$(SolutionDir)\.msbuild\Common.props" />
 	<Import Project="$(SolutionDir)\.msbuild\ReferencesRust.props" />
+	<Import Project="$(SolutionDir)\.msbuild\Configurations.props" />
+	<Import Project="$(SolutionDir)\.msbuild\Metadata.props" />
+	<Import Project="$(SolutionDir)\.msbuild\Tasks.targets" />
 
 	<ItemGroup>
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />

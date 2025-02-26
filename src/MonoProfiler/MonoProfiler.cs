@@ -7,14 +7,10 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
-using API.Logger;
 using Carbon.Profiler;
 using Facepunch;
 using Facepunch.Extend;
-using Network;
 using Newtonsoft.Json;
-using UnityEngine;
-using Application = Facepunch.Application;
 
 /*
  *
@@ -685,7 +681,7 @@ public static unsafe partial class MonoProfiler
 		}
 	}
 
-	private static void native_logger(Severity level, int verbosity, byte* data, int length, LogSource source)
+	private static void native_logger(int level, int verbosity, byte* data, int length, LogSource source)
 	{
 		UnityEngine.Debug.Log($"[{source}] {Encoding.UTF8.GetString(data, length)}");
 	}
@@ -1101,7 +1097,7 @@ public static unsafe partial class MonoProfiler
 	private static extern bool profiler_is_enabled();
 
 	[DllImport("CarbonNative")]
-	private static extern void carbon_init_logger(delegate*<Severity, int, byte*, int, LogSource, void> logger);
+	private static extern void carbon_init_logger(delegate*<int, int, byte*, int, LogSource, void> logger);
 
 	[DllImport("CarbonNative")]
 	private static extern ulong carbon_get_protocol();

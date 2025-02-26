@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Carbon.Components;
 using Carbon.Profiler;
+using UnityEngine;
 
 namespace Carbon;
 
@@ -13,6 +15,15 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 	{
 		MonoProfilerConfig.Load(configPath);
 		InitNative();
+
+		if (MonoProfiler.Crashed)
+		{
+			Debug.LogError($"Carbon.Profiler crashed! (NATIVE_PROTOCOL:{MonoProfiler.NATIVE_PROTOCOL} MANAGED_PROTOCOL:{MonoProfiler.MANAGED_PROTOCOL})");
+		}
+		else
+		{
+			Debug.Log($"Carbon.Profiler initialized! (NATIVE_PROTOCOL:{MonoProfiler.NATIVE_PROTOCOL} MANAGED_PROTOCOL:{MonoProfiler.MANAGED_PROTOCOL})");
+		}
 	}
 
 	public void OnUnloaded(OnHarmonyModUnloadedArgs args)
