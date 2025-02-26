@@ -18,12 +18,8 @@
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
 	</ItemGroup>
 
-	<Target Name="CustomRelease" AfterTargets="Build" DependsOnTargets="PrepareRelease">
-		<PropertyGroup>
-			<CarbonProfilerDir>$(SolutionDir)..\Release\.tmp\$(Configuration)\profiler</CarbonProfilerDir>
-		</PropertyGroup>
-		<MakeDir Directories="$(CarbonProfilerDir)\native"/>
+	<Target Name="CustomRelease" AfterTargets="Build">
+		<Copy SourceFiles="$(OutputPath)$(Product).dll" DestinationFolder="$(c_profiler)" />
 		<Copy SourceFiles="$(OutputPath)$(Product).dll" DestinationFolder="$(c_managed)" />
-		<Copy SourceFiles="$(OutputPath)$(Product).dll" DestinationFolder="$(CarbonProfilerDir)" />
 	</Target>
 </Project>
