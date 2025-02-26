@@ -64,7 +64,7 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 		{
 			if (!MonoProfiler.Enabled)
 			{
-				arg.ReplyWith("Mono profiler is disabled. Enable it in the 'carbon/config.profiler.json' config file. Must restart the server for changes to apply.");
+				arg.ReplyWith("Mono profiler is disabled. Enable it in the 'config.profiler.json' config file. Must restart the server for changes to apply.");
 				return;
 			}
 
