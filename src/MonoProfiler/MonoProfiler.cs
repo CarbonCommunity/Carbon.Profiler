@@ -737,12 +737,12 @@ public static unsafe partial class MonoProfiler
 
 		if (_profileTimer != null)
 		{
-			ServerMgr.Instance.CancelInvoke(_profileTimer);
+			HarmonyProfiler.Runner.CancelInvoke(_profileTimer);
 			_profileTimer = null;
 		}
 		if (_profileWarningTimer != null)
 		{
-			ServerMgr.Instance.CancelInvoke(_profileWarningTimer);
+			HarmonyProfiler.Runner.CancelInvoke(_profileWarningTimer);
 			_profileWarningTimer = null;
 		}
 
@@ -761,7 +761,7 @@ public static unsafe partial class MonoProfiler
 				UnityEngine.Debug.LogWarning($"[MonoProfiler] Profiling duration {((long)duration).FormatSeconds()}..");
 			}
 
-			ServerMgr.Instance.Invoke(_profileTimer = () =>
+			HarmonyProfiler.Runner.Invoke(_profileTimer = () =>
 			{
 				if (!IsRecording)
 				{
@@ -782,7 +782,7 @@ public static unsafe partial class MonoProfiler
 		}
 		else if(IsRecording && logging)
 		{
-			ServerMgr.Instance.Invoke(_profileWarningTimer = () =>
+			HarmonyProfiler.Runner.Invoke(_profileWarningTimer = () =>
 			{
 				UnityEngine.Debug.LogWarning($" Reminder: You've been profiling for {CurrentDurationTime.TotalSeconds}s");
 			}, 60 * 5);

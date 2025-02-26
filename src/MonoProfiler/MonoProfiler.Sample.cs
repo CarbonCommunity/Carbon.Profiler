@@ -83,9 +83,9 @@ public partial class MonoProfiler
 			Calls ??= new();
 			Memory ??= new();
 
-			Assemblies?.Clear();
-			Calls?.Clear();
-			Memory?.Clear();
+			Assemblies.Clear();
+			Calls.Clear();
+			Memory.Clear();
 			GC = default;
 		}
 

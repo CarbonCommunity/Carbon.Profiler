@@ -14,6 +14,7 @@
 	<Import Project="$(SolutionDir)\.msbuild\Tasks.targets" />
 
 	<ItemGroup>
+		<PackageReference Include="Lib.Harmony" Version="2.3.5" />
 		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
 	</ItemGroup>
 
