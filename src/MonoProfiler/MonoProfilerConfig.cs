@@ -15,6 +15,16 @@ namespace Carbon.Profiler;
 [Serializable]
 public class MonoProfilerConfig
 {
+#if HARMONYMOD
+	public bool Enabled = true;
+	public bool TrackCalls = true;
+	public bool SourceViewer = true;
+	public List<string> Assemblies = ["*"];
+	public List<string> Plugins = ["*"];
+	public List<string> Modules = ["*"];
+	public List<string> Extensions = ["*"];
+	public List<string> Harmony = ["*"];
+#else
 	public bool Enabled = false;
 	public bool TrackCalls = false;
 	public bool SourceViewer = false;
@@ -23,6 +33,7 @@ public class MonoProfilerConfig
 	public List<string> Modules = new();
 	public List<string> Extensions = new();
 	public List<string> Harmony = new();
+#endif
 
 	public const string Star = "*";
 
