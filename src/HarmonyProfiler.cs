@@ -301,7 +301,7 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 			SelfUpdate.Api(data =>
 			{
 				var profiler = data.FirstOrDefault(x => x["name"].ToObject<string>().Equals("profiler_build"));
-				var version = new System.Version(profiler?["version"].ToObject<string>() ?? string.Empty);
+				var version = new Version($"{profiler?["version"].ToObject<string>()}.0");
 				if (!SelfUpdate.CurrentVersion.Equals(version))
 				{
 					Debug.Log($"Carbon.Profiler is out of date! (current {SelfUpdate.CurrentVersion}, newer {version})");
