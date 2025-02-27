@@ -46,6 +46,11 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 			return;
 		}
 
+		if (IsOxideInstalled)
+		{
+			Debug.LogError($"Oxide is installed! Plugin and extension processing is hooked into.");
+		}
+
 		MonoProfilerConfig.Load(configPath);
 		InitNative();
 
