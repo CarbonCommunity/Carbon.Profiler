@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Carbon;
 
-public class Version
+public class SelfUpdate
 {
 	public const string Endpoint = "https://carbonmod.gg/api";
 
@@ -19,7 +19,7 @@ public class Version
 		"https://github.com/CarbonCommunity/Carbon/releases/download/profiler_build/Carbon.Windows.Profiler.zip";
 #endif
 
-	public static readonly System.Version CurrentVersion = typeof(Version).Assembly.GetName().Version;
+	public static readonly System.Version CurrentVersion = typeof(SelfUpdate).Assembly.GetName().Version;
 
 	private static Uri endpointUri = new(Endpoint);
 

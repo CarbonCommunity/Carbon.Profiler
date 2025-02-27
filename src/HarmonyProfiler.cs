@@ -291,28 +291,28 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 			var table = Pool.Get<TextTable>();
 			table.Clear();
 			table.AddColumns("version", "protocol", "managed", "native");
-			table.AddRow(Version.CurrentVersion.ToString(), string.Empty, MonoProfiler.MANAGED_PROTOCOL.ToString(), MonoProfiler.NATIVE_PROTOCOL.ToString());
+			table.AddRow(SelfUpdate.CurrentVersion.ToString(), string.Empty, MonoProfiler.MANAGED_PROTOCOL.ToString(), MonoProfiler.NATIVE_PROTOCOL.ToString());
 			var result = table.ToString().TrimEnd();
 			Pool.FreeUnsafe(ref table);
 			arg.ReplyWith(result);
 		}, description: "Prints the version of Carbon profiler");
 		AddCommand("carbon", "update_profiler", arg =>
 		{
-			Version.Api(data =>
+			SelfUpdate.Api(data =>
 			{
 				var profiler = data.FirstOrDefault(x => x["name"].ToObject<string>().Equals("profiler_build"));
 				var version = new System.Version(profiler?["version"].ToObject<string>() ?? string.Empty);
-				if (Version.CurrentVersion != version)
+				if (SelfUpdate.CurrentVersion != version)
 				{
-					Debug.Log($"Carbon.Profiler is out of date! (current {Version.CurrentVersion}, newer {version})");
-					Version.Update(() =>
+					Debug.Log($"Carbon.Profiler is out of date! (current {SelfUpdate.CurrentVersion}, newer {version})");
+					SelfUpdate.Update(() =>
 					{
 						Debug.Log($"Updated successfully.");
 					});
 				}
 				else
 				{
-					Debug.Log($"Carbon.Profiler is up to date! ({Version.CurrentVersion})");
+					Debug.Log($"Carbon.Profiler is up to date! ({SelfUpdate.CurrentVersion})");
 				}
 			});
 			arg.ReplyWith("Checking for updates..");
