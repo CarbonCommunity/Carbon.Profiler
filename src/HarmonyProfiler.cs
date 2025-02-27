@@ -5,6 +5,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Carbon.Components;
 using Carbon.Profiler;
+using Facepunch;
+using Newtonsoft.Json.Linq;
 using Steamworks;
 using UnityEngine;
 
@@ -25,13 +27,15 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 		}
 	}
 
+	private static FacepunchBehaviour _runner = GameObject.Find("Profiler Runner")?.GetComponent<FacepunchBehaviour>();
+
+	public static FacepunchBehaviour Runner => _runner ??= new GameObject("Profiler Runner").AddComponent<ProfilerRunner>();
+
 	public static bool IsCarbonInstalled = Type.GetType("Carbon.Community,Carbon.Common") != null;
 
 	public static bool IsOxideInstalled = Type.GetType("Oxide.Core.Interface,Oxide.Core") != null;
 
-	private static ProfilerRunner _runner;
-
-	public static ProfilerRunner Runner => _runner ??= (_runner = new GameObject("Profiler Runner").AddComponent<ProfilerRunner>());
+	public static bool IsAlreadyInstalled = _runner != null;
 
 	public static MonoProfiler.Sample ProfileSample = MonoProfiler.Sample.Create();
 
@@ -41,15 +45,29 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 
 	public void OnLoaded(OnHarmonyModLoadedArgs args)
 	{
+		if (IsAlreadyInstalled)
+		{
+			Debug.LogError($"Carbon.Profiler was already set up once! To use an updated version of the profiler, a reboot is required!");
+			_runner.Invoke(() =>
+			{
+				ConsoleSystem.Run(ConsoleSystem.Option.Server, "harmony.unload Carbon.Profiler");
+			}, 0.1f);
+			return;
+		}
+
 		if (IsCarbonInstalled)
 		{
-			Debug.LogError($"Carbon is installed! Remove the Carbon.Profiler HarmonyMod since the profiler is already built in.");
+			Debug.LogWarning($"Carbon is installed! Remove the Carbon.Profiler HarmonyMod since the profiler is already built in.");
+			Runner.Invoke(() =>
+			{
+				ConsoleSystem.Run(ConsoleSystem.Option.Server, "harmony.unload Carbon.Profiler");
+			}, 0.1f);
 			return;
 		}
 
 		if (IsOxideInstalled)
 		{
-			Debug.LogError($"Oxide is installed! Plugin and extension processing is hooked into.");
+			Debug.LogWarning($"Oxide is installed! Plugin and extension processing is hooked into.");
 		}
 
 		MonoProfilerConfig.Load(configPath);
@@ -62,7 +80,9 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 			MonoProfiler.TryStartProfileFor(MonoProfilerConfig.ProfileTypes.Assembly, assembly, assembly.GetName().Name);
 		}
 
-		Debug.LogError($"Carbon.Profiler {(MonoProfiler.Crashed ? "crashed" : "initialized")}! (NATIVE_PROTOCOL:{MonoProfiler.NATIVE_PROTOCOL} MANAGED_PROTOCOL:{MonoProfiler.MANAGED_PROTOCOL})");
+		Debug.LogWarning($"Carbon.Profiler {(MonoProfiler.Crashed ? "crashed" : "initialized")}! (NATIVE_PROTOCOL:{MonoProfiler.NATIVE_PROTOCOL} MANAGED_PROTOCOL:{MonoProfiler.MANAGED_PROTOCOL})");
+
+		GameObject.DontDestroyOnLoad(Runner.gameObject);
 
 		if (SteamServer.IsValid)
 		{
@@ -266,6 +286,37 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 				return false;
 			}
 		}, description: "Removes a plugin from being tracked. Reloading the plugin will remove it from being tracked. Restarting required for assemblies, modules and extensions", arguments: "[assembly|plugin|module|ext] [value]");
+		AddCommand("carbon", "profiler_version", arg =>
+		{
+			var table = Pool.Get<TextTable>();
+			table.Clear();
+			table.AddColumns("version", "protocol", "managed", "native");
+			table.AddRow(Version.CurrentVersion.ToString(), string.Empty, MonoProfiler.MANAGED_PROTOCOL.ToString(), MonoProfiler.NATIVE_PROTOCOL.ToString());
+			var result = table.ToString().TrimEnd();
+			Pool.FreeUnsafe(ref table);
+			arg.ReplyWith(result);
+		}, description: "Prints the version of Carbon profiler");
+		AddCommand("carbon", "update_profiler", arg =>
+		{
+			Version.Api(data =>
+			{
+				var profiler = data.FirstOrDefault(x => x["name"].ToObject<string>().Equals("profiler_build"));
+				var version = new System.Version(profiler?["version"].ToObject<string>() ?? string.Empty);
+				if (Version.CurrentVersion != version)
+				{
+					Debug.Log($"Carbon.Profiler is out of date! (current {Version.CurrentVersion}, newer {version})");
+					Version.Update(() =>
+					{
+						Debug.Log($"Updated successfully.");
+					});
+				}
+				else
+				{
+					Debug.Log($"Carbon.Profiler is up to date! ({Version.CurrentVersion})");
+				}
+			});
+			arg.ReplyWith("Checking for updates..");
+		}, description: "Checks if the profiler is out of date, and updates itself if it is.");
 		ConsoleSystem.Index.All = commands.ToArray();
 
 		static void AddCommand(string parent, string name, Action<ConsoleSystem.Arg> callback, string description = null, string arguments = null)

@@ -255,7 +255,8 @@ public static unsafe partial class MonoProfiler
 					continue;
 				}
 
-				table.AddRow($"{assemblyName.GetDisplayName(record.comparison.isCompared)}", $"{record.method_name}",
+				table.AddRow($"{assemblyName.GetDisplayName(record.comparison.isCompared)}",
+					record.method_name,
 					record.total_time == 0 ? string.Empty : record.GetTotalTime(),
 					record.total_time_percentage == 0 ? string.Empty : $"{record.total_time_percentage:0}%",
 					record.own_time == 0 ? string.Empty : record.GetOwnTime(),
