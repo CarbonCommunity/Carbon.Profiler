@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Carbon.Components;
 using Carbon.Profiler;
+using Steamworks;
 using UnityEngine;
 
 namespace Carbon;
@@ -47,6 +48,11 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 		InitNative();
 
 		Debug.LogError($"Carbon.Profiler {(MonoProfiler.Crashed ? "crashed" : "initialized")}! (NATIVE_PROTOCOL:{MonoProfiler.NATIVE_PROTOCOL} MANAGED_PROTOCOL:{MonoProfiler.MANAGED_PROTOCOL})");
+
+		if (SteamServer.IsValid)
+		{
+			Patches.Bootstrap_Init_Tier0.Postfix();
+		}
 	}
 
 	public void OnUnloaded(OnHarmonyModUnloadedArgs args)
