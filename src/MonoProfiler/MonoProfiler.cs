@@ -32,6 +32,7 @@ namespace Carbon.Components;
 public static unsafe partial class MonoProfiler
 {
 	public const string ProfileExtension = "cprf";
+	public static readonly string DecimalFormat = "n0";
 
 	public const ProfilerArgs AllFlags = AllNoTimingsFlags | ProfilerArgs.Timings;
 	public const ProfilerArgs AllNoTimingsFlags = ProfilerArgs.Calls | ProfilerArgs.CallMemory
@@ -131,7 +132,7 @@ public static unsafe partial class MonoProfiler
 		{
 			var table = Pool.Get<TextTable>();
 			table.Clear();
-			table.AddColumns("assembly", "total time", "(%)", "calls", "memory usage");
+			table.AddColumns("assembly", "total time", "(%)", "calls", "exceptions", "allocations");
 
 			foreach(AssemblyRecord record in this)
 			{
@@ -140,10 +141,11 @@ public static unsafe partial class MonoProfiler
 					continue;
 				}
 
-				table.AddRow($" {assemblyName.GetDisplayName(record.comparison.isCompared)}",
+				table.AddRow($"{assemblyName.GetDisplayName(record.comparison.isCompared)}",
 					record.total_time == 0 ? string.Empty : record.GetTotalTime(),
 					record.total_time_percentage == 0 ? string.Empty : $"{record.total_time_percentage:0}%",
-					record.calls == 0 ? string.Empty : $"{record.calls:n0}",
+					record.calls == 0 ? string.Empty : record.calls.ToString(DecimalFormat),
+					record.total_exceptions == 0 ? string.Empty : record.total_exceptions.ToString(DecimalFormat),
 					record.alloc.FormatBytes(true));
 			}
 
@@ -154,11 +156,12 @@ public static unsafe partial class MonoProfiler
 		public string ToCSV()
 		{
 			var builder = Pool.Get<StringBuilder>();
-			builder.AppendLine("Assembly," +
-			                   "Total Time," +
+			builder.AppendLine("assembly," +
+			                   "total time," +
 			                   "(%)," +
-			                   "Calls," +
-			                   "Memory Usage");
+			                   "calls," +
+			                   "exceptions," +
+			                   "allocations");
 
 			foreach (AssemblyRecord record in this)
 			{
@@ -170,7 +173,8 @@ public static unsafe partial class MonoProfiler
 				builder.AppendLine($"{assemblyName.GetDisplayName(record.comparison.isCompared)}," +
 				                   $"{record.GetTotalTime()}," +
 				                   $"{record.total_time_percentage:0}%," +
-				                   $"{record.calls:n0}," +
+				                   $"{record.calls.ToString(DecimalFormat)}," +
+				                   $"{record.total_exceptions.ToString(DecimalFormat)}," +
 				                   $"{record.alloc.FormatBytes(true)}");
 			}
 
@@ -242,7 +246,7 @@ public static unsafe partial class MonoProfiler
 		{
 			var table = Pool.Get<TextTable>();
 			table.Clear();
-			table.AddColumns("assembly", "method", "total time", "(%)", "own time", "(%)", "calls", "total memory", "own memory");
+			table.AddColumns("assembly", "method", "total time", "(%)", "own time", "(%)", "calls", "total exceptions", "own exceptions", "total allocations", "own allocations");
 
 			foreach (CallRecord record in this)
 			{
@@ -251,12 +255,14 @@ public static unsafe partial class MonoProfiler
 					continue;
 				}
 
-				table.AddRow($" {assemblyName.GetDisplayName(record.comparison.isCompared)}", $"{record.method_name}",
+				table.AddRow($"{assemblyName.GetDisplayName(record.comparison.isCompared)}", $"{record.method_name}",
 					record.total_time == 0 ? string.Empty : record.GetTotalTime(),
 					record.total_time_percentage == 0 ? string.Empty : $"{record.total_time_percentage:0}%",
 					record.own_time == 0 ? string.Empty : record.GetOwnTime(),
 					record.own_time_percentage == 0 ? string.Empty : $"{record.own_time_percentage:0}%",
-					record.calls == 0 ? string.Empty : $"{record.calls:n0}",
+					record.calls == 0 ? string.Empty : record.calls.ToString(DecimalFormat),
+					record.total_exceptions == 0 ? string.Empty : record.total_exceptions.ToString(DecimalFormat),
+					record.own_exceptions == 0 ? string.Empty : record.own_exceptions.ToString(DecimalFormat),
 					record.total_alloc == 0 ? string.Empty : record.total_alloc.FormatBytes(true),
 					record.own_alloc == 0 ? string.Empty : record.own_alloc.FormatBytes(true));
 			}
@@ -269,15 +275,7 @@ public static unsafe partial class MonoProfiler
 		{
 			StringBuilder builder = Pool.Get<StringBuilder>();
 
-			builder.AppendLine("Assembly," +
-			                   "Method," +
-			                   "Total Time," +
-			                   "(%)," +
-			                   "Own Time," +
-			                   "(%)," +
-			                   "Calls," +
-			                   "Memory Usage (Total)," +
-			                   "Memory Usage (Own)");
+			builder.AppendLine("assembly,method,total time,(%),own time,(%),calls,total exceptions,own exceptions,total allocations,own allocations");
 
 			foreach (CallRecord record in this)
 			{
@@ -293,6 +291,8 @@ public static unsafe partial class MonoProfiler
 				                   $"{record.GetOwnTime()}," +
 				                   $"{record.own_time_percentage:0}%," +
 				                   $"{record.calls:n0}," +
+				                   $"{record.total_exceptions.ToString(DecimalFormat)}," +
+				                   $"{record.own_exceptions.ToString(DecimalFormat)}," +
 				                   $"{record.total_alloc.FormatBytes(true)}," +
 				                   $"{record.own_alloc.FormatBytes(true)}");
 			}
@@ -352,7 +352,7 @@ public static unsafe partial class MonoProfiler
 		{
 			var table = Pool.Get<TextTable>();
 			table.Clear();
-			table.AddColumns("assembly", "class", "allocations", "total alloc. size", "instance size");
+			table.AddColumns("assembly", "class", "allocations", "total allocation size", "instance size");
 
 			foreach (MemoryRecord record in this)
 			{
@@ -361,10 +361,11 @@ public static unsafe partial class MonoProfiler
 					continue;
 				}
 
-				table.AddRow($" {assemblyName.GetDisplayName(record.comparison.isCompared)}", $"{record.class_name}",
-					record.allocations == 0 ? string.Empty : record.allocations.ToString("n0"),
+				table.AddRow($"{assemblyName.GetDisplayName(record.comparison.isCompared)}",
+					record.class_name,
+					record.allocations == 0 ? string.Empty : record.allocations.ToString(DecimalFormat),
 					record.total_alloc_size == 0 ? string.Empty : $"{record.total_alloc_size.FormatBytes(true)}",
-					record.instance_size == 0 ? string.Empty : $"{record.instance_size:n0}b");
+					record.instance_size == 0 ? string.Empty : $"{record.instance_size.ToString(DecimalFormat)}b");
 			}
 
 			var result = table.ToString();
@@ -374,11 +375,7 @@ public static unsafe partial class MonoProfiler
 		public string ToCSV()
 		{
 			StringBuilder builder = Pool.Get<StringBuilder>();
-			builder.AppendLine("Assembly," +
-			                   "Class," +
-			                   "Allocations," +
-			                   "Total Alloc. Size," +
-			                   "Instance Size");
+			builder.AppendLine("assembly,class,allocations,total allocation size,instance size");
 
 			foreach (MemoryRecord record in this)
 			{
@@ -389,9 +386,9 @@ public static unsafe partial class MonoProfiler
 
 				builder.AppendLine($"{assemblyName.GetDisplayName(record.comparison.isCompared)}," +
 				                   $"{record.class_name}," +
-				                   $"{record.allocations.ToString("n0")}," +
+				                   $"{record.allocations.ToString(DecimalFormat)}," +
 				                   $"{record.total_alloc_size.FormatBytes(true)}," +
-				                   $"{record.instance_size:n0}b");
+				                   $"{record.instance_size.ToString(DecimalFormat)}b");
 			}
 
 			string result = builder.ToString();
