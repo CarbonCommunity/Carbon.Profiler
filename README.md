@@ -19,3 +19,6 @@ Run `find carbon` upon server boot to get further command instructions.
 - `carbon.profile( [duration] [-cm] [-am] [-t] [-c] [-gc] )` Toggles the current state of the Carbon.Profiler
 - `carbon.abort_profile(  )` Stops a current profile from running
 - `carbon.export_profile( -c=CSV, -j=JSON, -t=Table, -p=ProtoBuf [default] )` Exports to disk the most recent profile
+- `carbon.tracked(  )` All tracking lists present in the config which are used by the Mono profiler for tracking
+- `carbon.track( [assembly|plugin|module|ext] [value] )` Adds an object to be tracked. Reloading the plugin will start tracking. Restarting required for assemblies, modules and extensions
+- `carbon.untrack( [assembly|plugin|module|ext] [value] )` Removes a plugin from being tracked. Reloading the plugin will remove it from being tracked. Restarting required for assemblies, modules and extensions
