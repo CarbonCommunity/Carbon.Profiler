@@ -55,6 +55,13 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 		MonoProfilerConfig.Load(configPath);
 		InitNative();
 
+		var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+		for (int i = 0; i < assemblies.Length; i++)
+		{
+			var assembly = assemblies[i];
+			MonoProfiler.TryStartProfileFor(MonoProfilerConfig.ProfileTypes.Assembly, assembly, assembly.GetName().Name);
+		}
+
 		Debug.LogError($"Carbon.Profiler {(MonoProfiler.Crashed ? "crashed" : "initialized")}! (NATIVE_PROTOCOL:{MonoProfiler.NATIVE_PROTOCOL} MANAGED_PROTOCOL:{MonoProfiler.MANAGED_PROTOCOL})");
 
 		if (SteamServer.IsValid)
