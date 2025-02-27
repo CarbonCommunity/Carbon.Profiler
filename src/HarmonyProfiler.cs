@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Carbon.Components;
 using Carbon.Profiler;
@@ -26,6 +27,8 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 
 	public static bool IsCarbonInstalled = Type.GetType("Carbon.Community,Carbon.Common") != null;
 
+	public static bool IsOxideInstalled = Type.GetType("Oxide.Core.Interface,Oxide.Core") != null;
+
 	private static ProfilerRunner _runner;
 
 	public static ProfilerRunner Runner => _runner ??= (_runner = new GameObject("Profiler Runner").AddComponent<ProfilerRunner>());
@@ -42,6 +45,11 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 		{
 			Debug.LogError($"Carbon is installed! Remove the Carbon.Profiler HarmonyMod since the profiler is already built in.");
 			return;
+		}
+
+		if (IsOxideInstalled)
+		{
+			Debug.LogError($"Oxide is installed! Plugin and extension processing is hooked into.");
 		}
 
 		MonoProfilerConfig.Load(configPath);
@@ -165,6 +173,92 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 				return $"Exported profile output at '{file}'";
 			}
 		}, description: "Exports to disk the most recent profile", arguments: "-c=CSV, -j=JSON, -t=Table, -p=ProtoBuf [default]");
+		AddCommand("carbon", "tracked", arg =>
+		{
+			arg.ReplyWith($"Tracked Assemblies ({MonoProfilerConfig.Instance.Assemblies.Count:n0}):\n" +
+			              $"{string.Join("\n", MonoProfilerConfig.Instance.Assemblies.Select(x => $"- {x}"))}\n" +
+			              $"Tracked Plugins ({MonoProfilerConfig.Instance.Plugins.Count:n0}):\n" +
+			              $"{string.Join("\n", MonoProfilerConfig.Instance.Plugins.Select(x => $"- {x}"))}\n" +
+			              $"Tracked Modules ({MonoProfilerConfig.Instance.Modules.Count:n0}):\n" +
+			              $"{string.Join("\n", MonoProfilerConfig.Instance.Modules.Select(x => $"- {x}"))}\n" +
+			              $"Tracked Extensions ({MonoProfilerConfig.Instance.Extensions.Count:n0}):\n" +
+			              $"{string.Join("\n", MonoProfilerConfig.Instance.Extensions.Select(x => $"- {x}"))}\n" +
+			              $"Use wildcard (*) to include all.");
+		}, description: "All tracking lists present in the config which are used by the Mono profiler for tracking");
+		AddCommand("carbon", "track", arg =>
+		{
+			if (!arg.HasArgs(2))
+			{
+				InvalidReturn(arg);
+				return;
+			}
+
+			var type = arg.GetString(0);
+			var value = arg.GetString(1);
+			MonoProfilerConfig.ProfileTypes returnType = default;
+
+			var returnVal = type switch
+			{
+				"assembly" => MonoProfilerConfig.Instance.AppendProfile(
+					returnType = MonoProfilerConfig.ProfileTypes.Assembly, value),
+				"plugin" => MonoProfilerConfig.Instance.AppendProfile(
+					returnType = MonoProfilerConfig.ProfileTypes.Plugin, value),
+				"module" => MonoProfilerConfig.Instance.AppendProfile(
+					returnType = MonoProfilerConfig.ProfileTypes.Module, value),
+				"ext" => MonoProfilerConfig.Instance.AppendProfile(
+					returnType = MonoProfilerConfig.ProfileTypes.Extension, value),
+				_ => InvalidReturn(arg)
+			};
+
+			arg.ReplyWith(returnVal
+				? $" Added {returnType} object '{value}' to tracking"
+				: $" Couldn't add {returnType} object '{value}' for tracking");
+
+			if (returnVal) MonoProfilerConfig.Save(configPath);
+
+			static bool InvalidReturn(ConsoleSystem.Arg arg)
+			{
+				arg.ReplyWith("Syntax: carbon.track [assembly|plugin|module|ext] [value]");
+				return false;
+			}
+		}, description: "Adds an object to be tracked. Reloading the plugin will start tracking. Restarting required for assemblies, modules and extensions", arguments: "[assembly|plugin|module|ext] [value]");
+		AddCommand("carbon", "untrack", arg =>
+		{
+			if (!arg.HasArgs(2))
+			{
+				InvalidReturn(arg);
+				return;
+			}
+
+			var type = arg.GetString(0);
+			var value = arg.GetString(1);
+			MonoProfilerConfig.ProfileTypes returnType = default;
+
+			var returnVal = type switch
+			{
+				"assembly" => MonoProfilerConfig.Instance.RemoveProfile(
+					returnType = MonoProfilerConfig.ProfileTypes.Assembly, value),
+				"plugin" => MonoProfilerConfig.Instance.RemoveProfile(
+					returnType = MonoProfilerConfig.ProfileTypes.Plugin, value),
+				"module" => MonoProfilerConfig.Instance.RemoveProfile(
+					returnType = MonoProfilerConfig.ProfileTypes.Module, value),
+				"ext" => MonoProfilerConfig.Instance.RemoveProfile(
+					returnType = MonoProfilerConfig.ProfileTypes.Extension, value),
+				_ => InvalidReturn(arg)
+			};
+
+			arg.ReplyWith(returnVal
+				? $" Removed {returnType} object '{value}' from tracking"
+				: $" Couldn't remove {returnType} object '{value}' for tracking");
+
+			if (returnVal) MonoProfilerConfig.Save(configPath);
+
+			static bool InvalidReturn(ConsoleSystem.Arg arg)
+			{
+				arg.ReplyWith("Syntax: carbon.untrack [assembly|plugin|module|ext] [value]");
+				return false;
+			}
+		}, description: "Removes a plugin from being tracked. Reloading the plugin will remove it from being tracked. Restarting required for assemblies, modules and extensions", arguments: "[assembly|plugin|module|ext] [value]");
 		ConsoleSystem.Index.All = commands.ToArray();
 
 		static void AddCommand(string parent, string name, Action<ConsoleSystem.Arg> callback, string description = null, string arguments = null)

@@ -118,4 +118,10 @@ public class MonoProfilerConfig
 		Instance = new MonoProfilerConfig();
 		File.WriteAllText(filePath, JsonConvert.SerializeObject(Instance, Formatting.Indented));
 	}
+
+	public static void Save(string filePath)
+	{
+		Instance ??= new MonoProfilerConfig();
+		File.WriteAllText(filePath, JsonConvert.SerializeObject(Instance, Formatting.Indented));
+	}
 }
