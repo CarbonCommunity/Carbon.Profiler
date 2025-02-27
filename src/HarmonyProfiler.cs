@@ -277,8 +277,8 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 				FullName = parent + "." + name,
 				Call = callback,
 				ServerAdmin = true,
-				Description = description,
-				Arguments = arguments
+				Description = description ?? string.Empty,
+				Arguments = arguments ?? string.Empty
 			};
 			commands.Add(command);
 			ConsoleSystem.Index.Server.Dict[command.FullName] = command;
