@@ -14,7 +14,7 @@ public class Version
 
 	public static readonly string DownloadEndpoint =
 #if UNIX
-		"https://github.com/CarbonCommunity/Carbon/releases/download/profiler_build/Carbon.Linux.Profiler.tar.gz"
+		"https://github.com/CarbonCommunity/Carbon/releases/download/profiler_build/Carbon.Linux.Profiler.tar.gz";
 #else
 		"https://github.com/CarbonCommunity/Carbon/releases/download/profiler_build/Carbon.Windows.Profiler.zip";
 #endif
