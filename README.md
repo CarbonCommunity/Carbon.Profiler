@@ -1,7 +1,6 @@
-![Carbon Light Logo](https://raw.githubusercontent.com/CarbonCommunity/.github/refs/heads/main/profile/press/carbonlogo_w.png#gh-dark-mode-only)
-![Carbon Dark Logo](https://raw.githubusercontent.com/CarbonCommunity/.github/refs/heads/main/profile/press/carbonlogo_b.png#gh-light-mode-only)
-
 <p align="center">
+  <img src="https://carbonmod.gg/assets/media/carbon_profiler_sq.jpg" height="30%" width="30%" />
+  <br /><br />
   <a href="https://github.com/CarbonCommunity/Carbon/releases/tag/profiler_build"><img src="https://github.com/CarbonCommunity/Carbon/actions/workflows/profiler-build.yml/badge.svg" /></a>
   <hr />
 </p>
