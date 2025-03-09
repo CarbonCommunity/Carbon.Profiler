@@ -130,8 +130,7 @@ public static unsafe partial class MonoProfiler
 
 		public string ToTable()
 		{
-			var table = Pool.Get<TextTable>();
-			table.Clear();
+			var table = new TextTable();
 			table.AddColumns("assembly", "total time", "(%)", "calls", "exceptions", "allocations");
 
 			foreach(AssemblyRecord record in this)
@@ -150,7 +149,7 @@ public static unsafe partial class MonoProfiler
 			}
 
 			var result = table.ToString();
-			Pool.FreeUnsafe(ref table);
+			table.Clear();
 			return result;
 		}
 		public string ToCSV()
@@ -244,8 +243,7 @@ public static unsafe partial class MonoProfiler
 
 		public string ToTable()
 		{
-			var table = Pool.Get<TextTable>();
-			table.Clear();
+			var table = new TextTable();
 			table.AddColumns("assembly", "method", "total time", "(%)", "own time", "(%)", "calls", "total exceptions", "own exceptions", "total allocations", "own allocations");
 
 			foreach (CallRecord record in this)
@@ -269,7 +267,7 @@ public static unsafe partial class MonoProfiler
 			}
 
 			var result = table.ToString();
-			Pool.FreeUnsafe(ref table);
+			table.Clear();
 			return result;
 		}
 		public string ToCSV()
@@ -351,8 +349,7 @@ public static unsafe partial class MonoProfiler
 
 		public string ToTable()
 		{
-			var table = Pool.Get<TextTable>();
-			table.Clear();
+			var table = new TextTable();
 			table.AddColumns("assembly", "class", "allocations", "total allocation size", "instance size");
 
 			foreach (MemoryRecord record in this)
@@ -370,7 +367,7 @@ public static unsafe partial class MonoProfiler
 			}
 
 			var result = table.ToString();
-			Pool.FreeUnsafe(ref table);
+			table.Clear();
 			return result;
 		}
 		public string ToCSV()
@@ -444,14 +441,13 @@ public static unsafe partial class MonoProfiler
 
 		public string ToTable()
 		{
-			var table = Pool.Get<TextTable>();
-			table.Clear();
+			var table = new TextTable();
 			table.AddColumns("calls", "total time");
 
 			table.AddRow($" {calls:n0}", $"{GetTotalTime()}");
 
 			var result = table.ToString();
-			Pool.FreeUnsafe(ref table);
+			table.Clear();
 			return result;
 		}
 		public string ToCSV()
@@ -790,8 +786,7 @@ public static unsafe partial class MonoProfiler
 
 		static void PrintWarn()
 		{
-			var table = Pool.Get<TextTable>();
-			table.Clear();
+			var table = new TextTable();
 			table.AddColumns(" duration", "processing", "assemblies", "calls");
 
 			table.AddRow(
@@ -801,7 +796,7 @@ public static unsafe partial class MonoProfiler
 				CallRecords.Count.ToString());
 
 			UnityEngine.Debug.LogWarning(table.ToString());
-			Pool.FreeUnsafe(ref table);
+			table.Clear();
 		}
 	}
 	public static bool? ToggleProfiling(ProfilerArgs args = AllFlags, bool logging = true)

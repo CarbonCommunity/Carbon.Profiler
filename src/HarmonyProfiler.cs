@@ -288,12 +288,11 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 		}, description: "Removes a plugin from being tracked. Reloading the plugin will remove it from being tracked. Restarting required for assemblies, modules and extensions", arguments: "[assembly|plugin|module|ext] [value]");
 		AddCommand("carbon", "profiler_version", arg =>
 		{
-			var table = Pool.Get<TextTable>();
-			table.Clear();
+			var table = new TextTable();
 			table.AddColumns("version", "protocol", "managed", "native");
 			table.AddRow(SelfUpdate.CurrentVersion.ToString(), string.Empty, MonoProfiler.MANAGED_PROTOCOL.ToString(), MonoProfiler.NATIVE_PROTOCOL.ToString());
 			var result = table.ToString().TrimEnd();
-			Pool.FreeUnsafe(ref table);
+			table.Clear();
 			arg.ReplyWith(result);
 		}, description: "Prints the version of Carbon profiler");
 		AddCommand("carbon", "update_profiler", arg =>
