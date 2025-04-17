@@ -652,7 +652,7 @@ public static unsafe partial class MonoProfiler
 	public static bool IsRecording { get; private set; }
 	public static bool Crashed { get; }
 
-	public static bool IsCleared => !AssemblyRecords.Any() && !CallRecords.Any();
+	public static bool IsCleared => AssemblyRecords.Count == 0 && CallRecords.Count == 0;
 
 	static MonoProfiler()
 	{
