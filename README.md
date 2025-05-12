@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://carbonmod.gg/assets/media/carbon_profiler_sq.jpg" height="30%" width="30%" />
+  <img src="https://cdn.carbonmod.gg/carbon_profiler_sq.jpg" height="30%" width="30%" />
   <br /><br />
   <a href="https://github.com/CarbonCommunity/Carbon/releases/tag/profiler_build"><img src="https://github.com/CarbonCommunity/Carbon/actions/workflows/profiler-build.yml/badge.svg" /></a>
   <hr />

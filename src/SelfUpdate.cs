@@ -10,7 +10,7 @@ namespace Carbon;
 
 public class SelfUpdate
 {
-	public const string Endpoint = "https://carbonmod.gg/api";
+	public const string Endpoint = "https://api.carbonmod.gg/releases";
 
 	public static readonly string DownloadEndpoint =
 #if UNIX
