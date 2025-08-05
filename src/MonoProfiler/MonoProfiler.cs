@@ -403,7 +403,7 @@ public static unsafe partial class MonoProfiler
 	}
 
 	/// <summary>
-	/// Used to identify dynamically managed and processed assemblies (such as plugins, hotloadable extensions/harmony mods) whenever they get hotloaded or assemblies with the same name get reloaded with changes.
+	/// Used to identify dynamically managed and processed assemblies (such as plugins and harmony mods) whenever they get hotloaded or assemblies with the same name get reloaded with changes.
 	/// </summary>
 	public class RuntimeAssemblyBank : ConcurrentDictionary<string, int>
 	{
