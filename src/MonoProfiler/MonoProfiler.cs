@@ -842,8 +842,11 @@ public static unsafe partial class MonoProfiler
 
 		if (!state)
 		{
-			DataProcessingTime = _dataProcessTimer.Elapsed;
-			Pool.FreeUnmanaged(ref _dataProcessTimer);
+			DataProcessingTime = _dataProcessTimer?.Elapsed ?? TimeSpan.Zero;
+			if (_dataProcessTimer != null)
+			{
+				Pool.FreeUnmanaged(ref _dataProcessTimer);
+			}
 		}
 
 		if (result != ProfilerResultCode.OK)
