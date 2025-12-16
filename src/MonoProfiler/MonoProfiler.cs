@@ -870,7 +870,7 @@ public static unsafe partial class MonoProfiler
 
 		GCStats = gcOutput;
 
-		CallRecords.Disabled = callOutput.IsEmpty();
+		CallRecords.Disabled = callOutput.Count == 0;
 
 		IsRecording = state;
 
