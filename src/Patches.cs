@@ -53,7 +53,7 @@ public class Patches
 
 		static MethodBase TargetMethod()
 		{
-			return AccessTools.TypeByName("Extension").GetConstructors()[0];
+			return AccessTools.TypeByName("Oxide.Core.Extensions.Extension").GetConstructors()[0];
 		}
 
 		public static void Prefix(object manager, object __instance)
