@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Carbon.Components;
 using Carbon.Profiler;
@@ -332,8 +334,39 @@ public sealed class HarmonyProfiler : IHarmonyModHooks
 				Arguments = arguments ?? string.Empty
 			};
 			commands.Add(command);
-			ConsoleSystem.Index.Server.Dict[command.FullName] = command;
+			AddCommandToServerIndex(command);
 			Debug.LogWarning($"Carbon.Profiler: Installed '{command.FullName}'");
+		}
+	}
+
+	// release vs staging branch fix for now
+	private static void AddCommandToServerIndex(ConsoleSystem.Command command)
+	{
+		try
+		{
+			var dictField = typeof(ConsoleSystem.Index.Server).GetField("Dict", BindingFlags.Public | BindingFlags.Static);
+			if (dictField?.GetValue(null) is not IDictionary dict)
+			{
+				throw new InvalidOperationException("ConsoleSystem.Index.Server.Dict is not available");
+			}
+
+			var keyType = dict.GetType().GetGenericArguments().FirstOrDefault();
+			if (keyType == null)
+			{
+				throw new InvalidOperationException($"Couldn't determine server command index key type '{dict.GetType().FullName}'");
+			}
+
+			var key = keyType == typeof(string) ? command.FullName : Activator.CreateInstance(keyType, command.FullName);
+			if (key == null)
+			{
+				throw new InvalidOperationException($"Couldn't create server command index key '{keyType.FullName}'");
+			}
+
+			dict[key] = command;
+		}
+		catch (Exception ex)
+		{
+			throw new InvalidOperationException($"Carbon.Profiler couldn't add '{command.FullName}' to server command index", ex);
 		}
 	}
 
