@@ -38,6 +38,12 @@ public class MonoProfilerConfig
 	public const string Star = "*";
 
 	/// <summary>
+	/// Plugins profiled for a single recording (carbon.profile_plugin). Not saved.
+	/// </summary>
+	[JsonIgnore]
+	public HashSet<string> TemporaryPlugins = new();
+
+	/// <summary>
 	/// HarmonyMods profiled for a single recording (carbon.profile_mod). Not saved.
 	/// </summary>
 	[JsonIgnore]
@@ -105,7 +111,7 @@ public class MonoProfilerConfig
 		return profile switch
 		{
 			ProfileTypes.Assembly => Assemblies.Contains(Star) || Assemblies.Contains(value),
-			ProfileTypes.Plugin => Plugins.Contains(Star) || Plugins.Contains(value),
+			ProfileTypes.Plugin => Plugins.Contains(Star) || Plugins.Contains(value) || TemporaryPlugins.Contains(value),
 			ProfileTypes.Module => Modules.Contains(Star) || Modules.Contains(value),
 			ProfileTypes.Extension => Extensions.Contains(Star) || Extensions.Contains(value),
 			ProfileTypes.Harmony => Harmony.Contains(Star) || Harmony.Contains(value) || TemporaryHarmonyMods.Contains(value),
