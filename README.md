@@ -13,6 +13,23 @@ Run `find carbon` upon server boot to get further command instructions.
 - Unzip the archive to the `HarmonyMods` directory of your Rust Dedicated Server.
 - Start the server and enjoy, or run `harmony.load` Carbon.Profiler.
 
+# How to profile
+The profiler starts the first time that you use a profiling command. By default, it tracks nothing and adds no hooks.
+An existing `config.profiler.json` keeps its settings.
+
+To profile one plugin or HarmonyMod for a set time, run `carbon.profile_plugin` or `carbon.profile_mod`.
+The command reloads the target with profiler hooks, records, and then reloads it without them.
+
+To keep profiling a plugin or HarmonyMod:
+1. Run `carbon.track plugin <name>` or `carbon.track harmony <name>`.
+2. Reload it with `oxide.reload <name>` or `harmony.load <name>`.
+3. Run `carbon.profile`.
+
+To profile game assemblies or Oxide extensions:
+1. Run `carbon.track assembly <name>` or `carbon.track ext <name>`.
+2. Set `Enabled` to `true` in `config.profiler.json`.
+3. Restart the server.
+
 # Commands
 
 - `carbon.profile( [duration] [-cm] [-am] [-t] [-c] [-gc] )` Toggles the current state of the Carbon.Profiler
