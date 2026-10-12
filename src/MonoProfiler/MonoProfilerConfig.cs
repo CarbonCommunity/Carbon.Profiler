@@ -37,6 +37,12 @@ public class MonoProfilerConfig
 
 	public const string Star = "*";
 
+	/// <summary>
+	/// HarmonyMods profiled for a single recording (carbon.profile_mod). Not saved.
+	/// </summary>
+	[JsonIgnore]
+	public HashSet<string> TemporaryHarmonyMods = new(StringComparer.OrdinalIgnoreCase);
+
 	public static MonoProfilerConfig Instance { get; set; }
 
 	public enum ProfileTypes
@@ -102,7 +108,7 @@ public class MonoProfilerConfig
 			ProfileTypes.Plugin => Plugins.Contains(Star) || Plugins.Contains(value),
 			ProfileTypes.Module => Modules.Contains(Star) || Modules.Contains(value),
 			ProfileTypes.Extension => Extensions.Contains(Star) || Extensions.Contains(value),
-			ProfileTypes.Harmony => Harmony.Contains(Star) || Harmony.Contains(value),
+			ProfileTypes.Harmony => Harmony.Contains(Star) || Harmony.Contains(value) || TemporaryHarmonyMods.Contains(value),
 			_ => throw new ArgumentOutOfRangeException(nameof(profile), profile, null)
 		};
 	}
