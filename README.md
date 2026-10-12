@@ -21,5 +21,5 @@ Run `find carbon` upon server boot to get further command instructions.
 - `carbon.profile_plugin( <name> <duration> [-cm] [-am] [-t] [-c] [-gc] )` Profiles one Oxide plugin: recompiles it with profiler hooks, records for the duration, then recompiles it without them
 - `carbon.export_profile( -c=CSV, -j=JSON, -t=Table, -p=ProtoBuf [default] )` Exports to disk the most recent profile
 - `carbon.tracked(  )` All tracking lists present in the config which are used by the Mono profiler for tracking
-- `carbon.track( [assembly|plugin|module|ext] [value] )` Adds an object to be tracked. Reloading the plugin will start tracking. Restarting required for assemblies, modules and extensions
-- `carbon.untrack( [assembly|plugin|module|ext] [value] )` Removes a plugin from being tracked. Reloading the plugin will remove it from being tracked. Restarting required for assemblies, modules and extensions
+- `carbon.track( [assembly|plugin|module|ext|harmony] [value] )` Adds an object to be tracked. Reloading the plugin will start tracking. Restarting required for assemblies, modules and extensions
+- `carbon.untrack( [assembly|plugin|module|ext|harmony] [value] )` Removes a plugin from being tracked. Reloading the plugin will remove it from being tracked. Restarting required for assemblies, modules and extensions
